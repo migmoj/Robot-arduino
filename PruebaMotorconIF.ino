@@ -2,12 +2,16 @@
 
 #include <IRLib.h>
 
-int RECV_PIN = 11;
-int MOTOR1DE = 5;  //Motor uno adelante
-int MOTOR1AT = 6;  //Motor uno atras
-int MOTOR2DE = 9;
-int MOTOR2AT = 10;
-int velocidad = 0;
+byte RECV_PIN = 11;
+byte MOTOR1DE = 5;  //Motor uno adelante
+byte MOTOR1AT = 6;  //Motor uno atras
+byte MOTOR2DE = 9;
+byte MOTOR2AT = 10;
+byte velocidad1 = 0;
+byte velocidad2 = 0;
+byte velocidad = 0;
+int sentido = 1;
+int a = 0;
 
 IRrecv My_Receiver(RECV_PIN);
 
@@ -32,7 +36,20 @@ void setup()
 
 void loop() {
 
-  analogWrite(MOTOR1DE, velocidad);
+   if (a >= 0){
+    analogWrite(MOTOR1DE, velocidad1);
+    analogWrite(MOTOR2DE, velocidad2);
+    analogWrite(MOTOR1AT, 0);
+    analogWrite(MOTOR2AT, 0);
+  }
+
+  if (a < 0){
+     analogWrite(MOTOR1AT, velocidad1);
+     analogWrite(MOTOR2AT, velocidad2);
+     analogWrite(MOTOR1DE, 0);
+     analogWrite(MOTOR2DE, 0);
+  }
+ delay (100);
   
   if (My_Receiver.GetResults(&My_Decoder)) {
     My_Receiver.resume(); 
@@ -40,16 +57,46 @@ void loop() {
     //My_Decoder.DumpResults();
     Serial.println(My_Decoder.value);
      
-  }
-  if (My_Decoder.value == 16747125){
-    velocidad = 120;
-    Serial.println (velocidad);
-  } 
-  if (My_Decoder.value == 16714485){
-    velocidad = 0;
-    Serial.println (velocidad);
-  } 
-   delay(100);
+    if (My_Decoder.value == 16747125){
+        velocidad = 120;
+           } else
+    if (My_Decoder.value == 16714485){
+       velocidad = 150;
+          } else
+    if (My_Decoder.value == 16716525){
+       velocidad = 180;
+          } else
+    if (My_Decoder.value == 16728255){
+       sentido = 1;
+          } else
+     if (My_Decoder.value == 16712445){
+       sentido = -1;
+          } else
+    if (My_Decoder.value == 16742535){
+       velocidad = 0;
+          } else
+    if (My_Decoder.value == 16752735){
+        velocidad --;
+          } else
+    if (My_Decoder.value == 16746615){
+       velocidad ++;
+          }
+    
+    a = velocidad * sentido;
+    velocidad1 = velocidad;
+    velocidad2 = velocidad;
+
+     if (My_Decoder.value == 16773135){
+        velocidad1 = 0;
+            } else
+    if (My_Decoder.value == 16769055){
+       velocidad2 = 0;
+           }
+
+  
+  
+   }
+   
 }
 /* 
   
